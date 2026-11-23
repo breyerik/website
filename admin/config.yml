@@ -1,0 +1,1068 @@
+# Sveltia CMS (kompatibel mit Decap CMS). Bearbeitet die Dateien in inhalt/.
+backend:
+  name: github
+  repo: '[PLATZHALTER]/website'
+  branch: main
+media_folder: inhalt/bilder
+public_folder: /bilder
+slug:
+  encoding: ascii
+  clean_accents: true
+collections:
+- name: seiten
+  label: Seiten
+  label_singular: Seite
+  folder: inhalt/seiten
+  format: json
+  extension: json
+  create: true
+  identifier_field: titel
+  slug: '{{fields.dateiname}}'
+  fields:
+  - name: titel
+    label: Seitentitel
+    widget: string
+  - name: dateiname
+    label: Dateiname (ohne .html)
+    widget: string
+    hint: index = Startseite
+  - name: beschreibung
+    label: Kurzbeschreibung für Google
+    widget: text
+    required: false
+  - name: nicht_indexieren
+    label: Nicht bei Google zeigen
+    widget: boolean
+    required: false
+  - name: abschnitte
+    label: Abschnitte
+    label_singular: Abschnitt
+    widget: list
+    typeKey: typ
+    hint: Abschnitte per Ziehen umsortieren, mit + neue Bausteine einfügen.
+    types:
+    - name: slideshow
+      label: Slideshow (großer Bildauftakt)
+      widget: object
+      fields:
+      - name: label
+        label: Überzeile
+        widget: string
+        required: false
+      - name: titel
+        label: Titel (Zeilenumbruch erlaubt)
+        widget: text
+        required: false
+      - name: text
+        label: Kurzer Text
+        widget: string
+        required: false
+      - name: button_text
+        label: Knopftext
+        widget: string
+        required: false
+      - name: button_ziel
+        label: Knopf-Link
+        widget: string
+        required: false
+      - name: zweiter_button_text
+        label: Zweiter Knopf, Text
+        widget: string
+        required: false
+      - name: zweiter_button_ziel
+        label: Zweiter Knopf, Link
+        widget: string
+        required: false
+      - name: nur_bilder
+        label: Nur Bilder (ohne Text)
+        widget: boolean
+        default: false
+        required: false
+      - name: sekunden_pro_bild
+        label: Sekunden pro Bild
+        widget: number
+        value_type: float
+        default: 5.5
+      - name: bilder
+        label: Bilder
+        widget: list
+        fields:
+        - name: bild
+          label: Bild
+          widget: image
+        - name: titel
+          label: Bildunterschrift
+          widget: string
+          required: false
+        - name: alt
+          label: Bildbeschreibung (für Blinde)
+          widget: string
+          required: false
+        - name: fokus
+          label: Bildausschnitt (z. B. 50% 40% = Mitte, etwas oberhalb)
+          widget: string
+          required: false
+        - name: ziel
+          label: Link der Bildunterschrift (z. B. referenz-bb-69.html)
+          widget: string
+          required: false
+    - name: open_house
+      label: Open House (Daten in Einstellungen)
+      widget: object
+      fields:
+      - &id001
+        name: anker
+        label: Sprungziel (z. B. kontakt)
+        widget: string
+        required: false
+      - &id002
+        name: sprungmarke
+        label: Name im Seitenmenü
+        widget: string
+        required: false
+      - &id003
+        name: hintergrund
+        label: Hintergrund
+        widget: select
+        options:
+        - weiss
+        - beige
+        default: weiss
+        required: false
+      - &id004
+        name: ausblenden
+        label: Abschnitt ausblenden
+        widget: boolean
+        default: false
+        required: false
+      - name: label
+        label: Überzeile
+        widget: string
+        required: false
+      - name: titel
+        label: Titel
+        widget: string
+        required: false
+      - name: text
+        label: Text ({{open_house_ort}}, {{open_house_zeit}} werden ersetzt)
+        widget: string
+        required: false
+      - name: button_text
+        label: Knopftext
+        widget: string
+        required: false
+      - name: hinweis
+        label: Hinweis
+        widget: hidden
+    - name: preise
+      label: Preisliste (an/aus in Einstellungen)
+      widget: object
+      fields:
+      - *id001
+      - *id002
+      - *id003
+      - *id004
+      - name: label
+        label: Überzeile
+        widget: string
+        required: false
+      - name: titel
+        label: Titel
+        widget: string
+        required: false
+      - name: text
+        label: Text
+        widget: text
+        required: false
+      - name: einheiten
+        label: Einheiten
+        widget: list
+        fields:
+        - name: name
+          label: Name
+          widget: string
+          required: false
+        - name: preis
+          label: Preis
+          widget: string
+          required: false
+        - name: zusatz
+          label: Zusatz (z. B. Grundstück)
+          widget: string
+          required: false
+        - {name: flaeche, label: Wohn-/Nutzfläche, widget: string, required: false}
+        - {name: zimmer, label: Zimmer, widget: string, required: false}
+        - {name: grundstueck, label: Grundstück, widget: string, required: false}
+        - {name: status, label: "Status (z. B. reserviert, verkauft – leer = nicht anzeigen)", widget: string, required: false}
+      - name: hinweis
+        label: Hinweis
+        widget: string
+        required: false
+    - name: energieausweis
+      label: Energieausweis (§ 87 GEG)
+      widget: object
+      fields:
+      - *id001
+      - *id002
+      - *id003
+      - *id004
+      - name: label
+        label: Überzeile
+        widget: string
+        required: false
+      - name: titel
+        label: Titel
+        widget: string
+        required: false
+      - name: art
+        label: Art des Ausweises
+        widget: string
+        required: false
+      - name: endenergie
+        label: Endenergiebedarf in kWh/(m²·a), nur Zahl
+        widget: string
+        required: false
+      - name: energietraeger
+        label: Wesentlicher Energieträger
+        widget: string
+        required: false
+      - name: baujahr
+        label: Baujahr
+        widget: string
+        required: false
+      - name: effizienzklasse
+        label: Effizienzklasse
+        widget: string
+        required: false
+      - name: hinweis
+        label: Hinweis
+        widget: string
+        required: false
+    - name: termin
+      label: Termin / Einladung
+      widget: object
+      fields:
+      - name: anker
+        label: Sprungziel (z. B. kontakt)
+        widget: string
+        required: false
+      - name: sprungmarke
+        label: Name im Seitenmenü
+        widget: string
+        required: false
+      - name: hintergrund
+        label: Hintergrund
+        widget: select
+        options:
+        - weiss
+        - beige
+        default: weiss
+        required: false
+      - name: ausblenden
+        label: Abschnitt ausblenden
+        widget: boolean
+        default: false
+        required: false
+      - name: datum_gross
+        label: Datum groß
+        widget: string
+      - name: datum_klein
+        label: Datum klein
+        widget: string
+        required: false
+      - name: label
+        label: Überzeile
+        widget: string
+        required: false
+      - name: titel
+        label: Titel
+        widget: string
+      - name: text
+        label: Text
+        widget: text
+        required: false
+      - name: button_text
+        label: Knopftext
+        widget: string
+        required: false
+      - name: button_link
+        label: Knopf-Link (auch mailto:)
+        widget: string
+        required: false
+    - name: bild_und_text
+      label: Bild und Text
+      widget: object
+      fields:
+      - name: anker
+        label: Sprungziel (z. B. kontakt)
+        widget: string
+        required: false
+      - name: sprungmarke
+        label: Name im Seitenmenü
+        widget: string
+        required: false
+      - name: hintergrund
+        label: Hintergrund
+        widget: select
+        options:
+        - weiss
+        - beige
+        default: weiss
+        required: false
+      - name: ausblenden
+        label: Abschnitt ausblenden
+        widget: boolean
+        default: false
+        required: false
+      - name: bild
+        label: Bild
+        widget: image
+      - name: bild_alt
+        label: Bildbeschreibung
+        widget: string
+        required: false
+      - name: bild_hinweis
+        label: Kleiner Hinweis unter dem Bild
+        widget: string
+        required: false
+      - name: bild_rechts
+        label: Bild rechts
+        widget: boolean
+        default: false
+      - name: label
+        label: Überzeile
+        widget: string
+        required: false
+      - name: titel
+        label: Titel
+        widget: string
+      - name: titel_kursiv
+        label: Titel, zweite Zeile kursiv
+        widget: string
+        required: false
+      - name: text
+        label: Text
+        widget: markdown
+        required: false
+      - name: link_text
+        label: Linktext
+        widget: string
+        required: false
+      - name: link_ziel
+        label: Linkziel
+        widget: string
+        required: false
+      - name: link_als_knopf
+        label: Link als Knopf darstellen
+        widget: boolean
+        default: false
+        required: false
+      - name: besichtigung_anfragen
+        label: Zusätzlich Knopf „Besichtigung anfragen“ (E-Mail)
+        widget: boolean
+        default: false
+        required: false
+      - name: kennzahlen
+        label: Kennzahlen
+        widget: list
+        required: false
+        fields:
+        - name: wert
+          label: Wert
+          widget: string
+        - name: bezeichnung
+          label: Bezeichnung
+          widget: string
+      - name: bild_fokus
+        label: Bildausschnitt (z. B. 50% 40%)
+        widget: string
+        required: false
+      - {name: ki_bild, label: KI-generiertes Bild kennzeichnen, widget: boolean, default: false, required: false}
+      - {name: bild_platzhalter, label: Platzhaltertext (solange kein Bild gewählt ist), widget: string, required: false}
+      - {name: bild_format, label: "Format des Platzhalters (z. B. 4/5)", widget: string, required: false}
+      - name: stil
+        label: Darstellung
+        widget: select
+        options:
+        - angebot
+        - referenz
+        - portrait
+        required: false
+    - name: referenz_auswahl
+      label: Referenzen-Auswahl (Karten aus der Seite Referenzen)
+      widget: object
+      fields:
+      - name: anker
+        label: Sprungziel
+        widget: string
+        required: false
+      - name: hintergrund
+        label: Hintergrund
+        widget: select
+        options:
+        - weiss
+        - beige
+        default: weiss
+        required: false
+      - name: ausblenden
+        label: Abschnitt ausblenden
+        widget: boolean
+        default: false
+        required: false
+      - name: label
+        label: Überzeile
+        widget: string
+        required: false
+      - name: titel
+        label: Titel
+        widget: string
+        required: false
+      - name: anzahl
+        label: Anzahl Projekte
+        widget: number
+        default: 3
+        required: false
+      - name: link_text
+        label: Linktext
+        widget: string
+        required: false
+      - name: link_ziel
+        label: Linkziel
+        widget: string
+        required: false
+    - name: referenz_detail
+      label: Referenz-Detailseite
+      widget: object
+      fields:
+      - {name: titel, label: Projektname, widget: string}
+      - {name: untertitel, label: Untertitel, widget: string, required: false}
+      - {name: bild, label: Titelbild, widget: image}
+      - {name: fokus, label: Bildausschnitt Titelbild (z. B. 50% 35%), widget: string, required: false}
+      - {name: portraet_titel, label: Überschrift Projektbeschreibung, widget: string, required: false}
+      - {name: text, label: Projektbeschreibung, widget: markdown, required: false}
+      - name: fakten
+        label: Fakten
+        widget: list
+        required: false
+        fields:
+        - {name: wert, label: Wert, widget: string}
+        - {name: text, label: Bezeichnung, widget: string}
+      - name: bilder
+        label: Galerie
+        widget: list
+        fields:
+        - {name: bild, label: Bild, widget: image}
+        - {name: alt, label: Bildbeschreibung, widget: string}
+        - {name: fokus, label: Bildausschnitt, widget: string, required: false}
+      - name: video
+        label: Video (optional, stumm, läuft in Schleife)
+        widget: object
+        required: false
+        fields:
+        - name: quellen
+          label: "Video-Dateien (Reihenfolge = Vorrang: AV1, HEVC, H.264)"
+          widget: list
+          fields:
+          - {name: datei, label: Datei, widget: file}
+          - {name: typ, label: "Typ (z. B. video/mp4; codecs=av01.0.08M.08)", widget: string, required: false}
+        - {name: poster, label: Standbild, widget: image, required: false}
+        - {name: titel, label: Bildunterschrift, widget: string, required: false}
+        - {name: beschreibung, label: Beschreibung (für Blinde), widget: string, required: false}
+      - {name: abschluss_label, label: Abschluss Überzeile, widget: string, required: false}
+      - {name: abschluss_titel, label: Abschluss Titel, widget: string, required: false}
+      - {name: abschluss_text, label: Abschluss Text, widget: text, required: false}
+      - {name: naechstes_ziel, label: Nächstes Projekt (Datei), widget: string, required: false}
+      - {name: naechstes_projekt, label: Nächstes Projekt (Name), widget: string, required: false}
+    - name: einleitung
+      label: Einleitung (Seitenkopf mit Text)
+      widget: object
+      fields:
+      - {name: label, label: Überzeile, widget: string, required: false}
+      - {name: titel, label: Titel, widget: string}
+      - {name: titel_kursiv, label: Titel – farbiger Teil, widget: string, required: false}
+      - {name: text, label: Text, widget: markdown, required: false}
+    - name: grossbild
+      label: Großes Bild
+      widget: object
+      fields:
+      - {name: bild, label: Bild, widget: image, required: false}
+      - {name: bild_alt, label: Bildbeschreibung, widget: string, required: false}
+      - {name: bild_platzhalter, label: Platzhaltertext (solange kein Bild gewählt ist), widget: string, required: false}
+      - {name: format, label: "Bildformat (z. B. 21/9)", widget: string, required: false}
+      - {name: bild_fokus, label: Bildausschnitt, widget: string, required: false}
+      - {name: breite, label: Breite, widget: select, options: [voll, inhalt], required: false}
+      - {name: bildunterschrift, label: Bildunterschrift, widget: string, required: false}
+    - name: leitsatz
+      label: Leitsatz (dunkler Abschluss)
+      widget: object
+      fields:
+      - {name: label, label: Überzeile, widget: string, required: false}
+      - {name: titel, label: Satz, widget: string}
+      - {name: titel_kursiv, label: Satz – farbiger Teil, widget: string, required: false}
+      - {name: text, label: Text, widget: string, required: false}
+      - {name: link_text, label: Knopf 1 Text, widget: string, required: false}
+      - {name: link_ziel, label: Knopf 1 Link, widget: string, required: false}
+      - {name: zweiter_link_text, label: Knopf 2 Text, widget: string, required: false}
+      - {name: zweiter_link_ziel, label: Knopf 2 Link, widget: string, required: false}
+    - name: galerie
+      label: Galerie
+      widget: object
+      fields:
+      - {name: anker, label: Sprungziel, widget: string, required: false}
+      - {name: sprungmarke, label: Name im Seitenmenü, widget: string, required: false}
+      - {name: hintergrund, label: Hintergrund, widget: select, options: [weiss, beige], required: false}
+      - {name: label, label: Überzeile, widget: string, required: false}
+      - {name: titel, label: Titel, widget: string, required: false}
+      - {name: text, label: Hinweis rechts (leer = Anzahl der Aufnahmen), widget: string, required: false}
+      - name: bilder
+        label: Bilder
+        widget: list
+        fields:
+        - {name: bild, label: Bild, widget: image}
+        - {name: titel, label: Bildunterschrift, widget: string, required: false}
+        - {name: alt, label: Bildbeschreibung (für Blinde), widget: string}
+        - {name: layout, label: "Größe (breit = volle Breite, gross = 2/3, hoch = 1/3 für Hochformate)", widget: select, options: [breit, gross, hoch], default: gross}
+        - {name: fokus, label: Bildausschnitt, widget: string, required: false}
+    - name: team
+      label: Team / Geschäftsführung
+      widget: object
+      fields:
+      - {name: anker, label: Sprungziel, widget: string, required: false}
+      - {name: hintergrund, label: Hintergrund, widget: select, options: [weiss, beige], required: false}
+      - {name: label, label: Überzeile, widget: string, required: false}
+      - {name: titel, label: Titel, widget: string}
+      - {name: titel_kursiv, label: Titel – farbiger Teil, widget: string, required: false}
+      - {name: text, label: Text, widget: markdown, required: false}
+      - name: personen
+        label: Personen
+        widget: list
+        fields:
+        - {name: name, label: Name, widget: string}
+        - {name: funktion, label: Funktion, widget: string, required: false}
+        - {name: bild, label: Porträt (Farbe), widget: image}
+        - {name: bild_sw, label: "Porträt (Schwarz-Weiß, optional – wird beim Darüberfahren farbig)", widget: image, required: false}
+    - name: titelbild
+      label: Großes Titelbild
+      widget: object
+      fields:
+      - name: bild
+        label: Bild
+        widget: image
+      - name: bild_alt
+        label: Bildbeschreibung
+        widget: string
+        required: false
+      - name: label
+        label: Überzeile
+        widget: string
+        required: false
+      - name: titel
+        label: Titel
+        widget: string
+      - name: titel_kursiv
+        label: Titel, kursiver Teil
+        widget: string
+        required: false
+      - name: bild_fokus
+        label: Bildausschnitt (z. B. 50% 40%)
+        widget: string
+        required: false
+      - name: text
+        label: Text
+        widget: text
+        required: false
+      - name: kennzahlen
+        label: Kennzahlen
+        widget: list
+        fields:
+        - name: wert
+          label: Wert
+          widget: string
+        - name: bezeichnung
+          label: Bezeichnung
+          widget: string
+    - name: sprungmarken
+      label: Seitenmenü (zeigt automatisch alle Abschnitte mit Name im Seitenmenü)
+      widget: object
+      fields:
+      - name: hinweis
+        label: Hinweis
+        widget: hidden
+    - name: text_und_punkte
+      label: Text mit Vorteilen
+      widget: object
+      fields:
+      - name: anker
+        label: Sprungziel (z. B. kontakt)
+        widget: string
+        required: false
+      - name: sprungmarke
+        label: Name im Seitenmenü
+        widget: string
+        required: false
+      - name: hintergrund
+        label: Hintergrund
+        widget: select
+        options:
+        - weiss
+        - beige
+        default: weiss
+        required: false
+      - name: ausblenden
+        label: Abschnitt ausblenden
+        widget: boolean
+        default: false
+        required: false
+      - name: label
+        label: Überzeile
+        widget: string
+        required: false
+      - name: titel
+        label: Titel
+        widget: text
+      - name: text
+        label: Text
+        widget: markdown
+      - name: punkte
+        label: Vorteile
+        widget: list
+        fields:
+        - name: titel
+          label: Titel
+          widget: string
+        - name: text
+          label: Text
+          widget: string
+          required: false
+        - name: nur_bei_open_house
+          label: Nur zeigen, wenn Open House aktiv
+          widget: boolean
+          required: false
+    - name: tabelle_und_text
+      label: Tabelle und Text
+      widget: object
+      fields:
+      - name: anker
+        label: Sprungziel (z. B. kontakt)
+        widget: string
+        required: false
+      - name: sprungmarke
+        label: Name im Seitenmenü
+        widget: string
+        required: false
+      - name: hintergrund
+        label: Hintergrund
+        widget: select
+        options:
+        - weiss
+        - beige
+        default: weiss
+        required: false
+      - name: ausblenden
+        label: Abschnitt ausblenden
+        widget: boolean
+        default: false
+        required: false
+      - name: label
+        label: Überzeile
+        widget: string
+        required: false
+      - name: titel
+        label: Titel
+        widget: string
+      - name: zeilen
+        label: Tabellenzeilen
+        widget: list
+        fields:
+        - name: bezeichnung
+          label: Bezeichnung
+          widget: string
+        - name: wert
+          label: Wert
+          widget: string
+      - name: rechts_label
+        label: 'Rechts: Überzeile'
+        widget: string
+        required: false
+      - name: rechts_titel
+        label: 'Rechts: Titel'
+        widget: text
+        required: false
+      - name: rechts_text
+        label: 'Rechts: Text'
+        widget: text
+        required: false
+      - name: button_text
+        label: Knopftext
+        widget: string
+        required: false
+      - name: button_link
+        label: Knopf-Link
+        widget: string
+        required: false
+      - name: hinweis
+        label: Kleiner Hinweis
+        widget: string
+        required: false
+    - name: plaene
+      label: Pläne und Download
+      widget: object
+      fields:
+      - name: anker
+        label: Sprungziel (z. B. kontakt)
+        widget: string
+        required: false
+      - name: sprungmarke
+        label: Name im Seitenmenü
+        widget: string
+        required: false
+      - name: hintergrund
+        label: Hintergrund
+        widget: select
+        options:
+        - weiss
+        - beige
+        default: weiss
+        required: false
+      - name: ausblenden
+        label: Abschnitt ausblenden
+        widget: boolean
+        default: false
+        required: false
+      - name: label
+        label: Überzeile
+        widget: string
+        required: false
+      - name: titel
+        label: Titel
+        widget: string
+      - name: plaene
+        label: Pläne
+        widget: list
+        fields:
+        - name: bild
+          label: Bild
+          widget: image
+        - name: titel
+          label: Titel
+          widget: string
+        - name: alt
+          label: Bildbeschreibung
+          widget: string
+          required: false
+        - name: raeume
+          label: Räume
+          widget: list
+          required: false
+          fields:
+          - {name: raum, label: Raum, widget: string}
+          - {name: flaeche, label: Fläche, widget: string}
+        - name: summen
+          label: Summenzeilen
+          widget: list
+          required: false
+          fields:
+          - {name: raum, label: Bezeichnung, widget: string}
+          - {name: flaeche, label: Fläche, widget: string}
+        - {name: hinweis, label: Hinweis unter dem Plan, widget: string, required: false}
+      - {name: plaene_hinweis, label: Hinweis unter den Plänen, widget: string, required: false}
+      - name: download_datei
+        label: PDF zum Download
+        widget: file
+        media_folder: /inhalt/dateien
+        public_folder: /dateien
+        required: false
+      - name: download_text
+        label: Downloadtext
+        widget: string
+        required: false
+      - name: download_untertitel
+        label: Download-Untertitel
+        widget: string
+        required: false
+    - name: zwei_spalten
+      label: Zwei Spalten Text
+      widget: object
+      fields:
+      - name: anker
+        label: Sprungziel (z. B. kontakt)
+        widget: string
+        required: false
+      - name: sprungmarke
+        label: Name im Seitenmenü
+        widget: string
+        required: false
+      - name: hintergrund
+        label: Hintergrund
+        widget: select
+        options:
+        - weiss
+        - beige
+        default: weiss
+        required: false
+      - name: ausblenden
+        label: Abschnitt ausblenden
+        widget: boolean
+        default: false
+        required: false
+      - name: label
+        label: Überzeile
+        widget: string
+        required: false
+      - name: titel
+        label: Titel
+        widget: string
+      - name: titel_kursiv
+        label: Titel, zweite Zeile kursiv
+        widget: string
+        required: false
+      - name: text
+        label: Text
+        widget: markdown
+      - name: text_open_house
+        label: Zusatztext nur während Open House
+        widget: text
+        required: false
+      - name: link_text
+        label: Linktext
+        widget: string
+        required: false
+      - name: link_ziel
+        label: Linkziel
+        widget: string
+        required: false
+    - name: kontakt
+      label: Kontakt
+      widget: object
+      fields:
+      - name: anker
+        label: Sprungziel (z. B. kontakt)
+        widget: string
+        required: false
+      - name: sprungmarke
+        label: Name im Seitenmenü
+        widget: string
+        required: false
+      - name: hintergrund
+        label: Hintergrund
+        widget: select
+        options:
+        - weiss
+        - beige
+        default: weiss
+        required: false
+      - name: ausblenden
+        label: Abschnitt ausblenden
+        widget: boolean
+        default: false
+        required: false
+      - name: label
+        label: Überzeile
+        widget: string
+        required: false
+      - name: titel
+        label: Titel
+        widget: text
+      - name: text
+        label: Text
+        widget: text
+        required: false
+      - name: person_label
+        label: Überzeile Ansprechpartner
+        widget: string
+        required: false
+    - name: text
+      label: Freier Text
+      widget: object
+      fields:
+      - name: anker
+        label: Sprungziel (z. B. kontakt)
+        widget: string
+        required: false
+      - name: sprungmarke
+        label: Name im Seitenmenü
+        widget: string
+        required: false
+      - name: hintergrund
+        label: Hintergrund
+        widget: select
+        options:
+        - weiss
+        - beige
+        default: weiss
+        required: false
+      - name: ausblenden
+        label: Abschnitt ausblenden
+        widget: boolean
+        default: false
+        required: false
+      - name: label
+        label: Überzeile
+        widget: string
+        required: false
+      - name: titel
+        label: Titel
+        widget: string
+      - name: text
+        label: Text
+        widget: markdown
+- name: einstellungen
+  label: Einstellungen
+  files:
+  - name: allgemein
+    label: Firma, Kontakt, Menü
+    file: inhalt/einstellungen.json
+    format: json
+    fields:
+    - name: firmenname
+      label: Firmenname
+      widget: string
+    - name: logo
+      label: Logo
+      widget: image
+    - name: fusszeile_logo_text
+      label: Schriftzug in der Fußzeile
+      widget: string
+    - name: fusszeile_text
+      label: Text in der Fußzeile
+      widget: string
+      hint: '{{firma}} wird durch den Firmennamen ersetzt'
+    - name: kontakt
+      label: Kontakt
+      widget: object
+      fields:
+      - name: name
+        label: Ansprechpartner
+        widget: string
+      - name: telefon
+        label: Telefon (Format +49…)
+        widget: string
+      - name: telefon_anzeige
+        label: Telefon, wie angezeigt
+        widget: string
+      - name: email
+        label: E-Mail
+        widget: string
+      - name: email_bestaetigt
+        label: E-Mail bestätigt
+        widget: boolean
+        default: false
+    - name: social
+      label: Social Media (Links in Fußzeile und Handy-Menü)
+      widget: list
+      required: false
+      fields:
+      - {name: name, label: "Kanal (z. B. Instagram)", widget: string}
+      - {name: konto, label: "Kontoname (z. B. @breyer.wohnbau)", widget: string, required: false}
+      - {name: url, label: Adresse, widget: string}
+    - name: navigation
+      label: Hauptmenü
+      widget: list
+      fields:
+      - name: text
+        label: Text
+        widget: string
+      - name: ziel
+        label: Ziel (z. B. angebot.html)
+        widget: string
+      - name: hervorgehoben
+        label: Als Knopf hervorheben
+        widget: boolean
+        default: false
+    - name: suchmaschinen_erlauben
+      label: Bei Google sichtbar
+      widget: boolean
+      default: false
+    - name: open_house
+      label: Open House
+      widget: object
+      fields:
+      - name: anzeigen
+        label: Open House anzeigen
+        widget: boolean
+      - name: datum
+        label: Datum
+        widget: datetime
+        time_format: false
+        date_format: DD.MM.YYYY
+        format: YYYY-MM-DD
+      - name: uhrzeit_von
+        label: Von (z. B. 13:00)
+        widget: string
+        required: false
+      - name: uhrzeit_bis
+        label: Bis (z. B. 16:00)
+        widget: string
+        required: false
+      - name: uhrzeit_vorlaeufig
+        label: Uhrzeit noch vorläufig (gelb markieren)
+        widget: boolean
+      - name: ort
+        label: Ort
+        widget: string
+        required: false
+    - name: preise_anzeigen
+      label: Preise anzeigen
+      widget: boolean
+      default: true
+    - name: adresse_der_website
+      label: Adresse der Website (leer lassen, bis Domain feststeht)
+      widget: string
+      required: false
+    - name: adresse_der_website_hinweis
+      label: Hinweis
+      widget: hidden
+  - name: design
+    label: Farben und Schriften
+    file: inhalt/design.json
+    format: json
+    fields:
+    - name: farben
+      label: Farben
+      widget: object
+      fields:
+      - name: akzent
+        label: Akzentfarbe (Knöpfe, Überzeilen)
+        widget: color
+      - name: akzent_hell
+        label: Heller Hintergrund
+        widget: color
+      - name: akzent_mittel
+        label: Akzent mittel
+        widget: color
+      - name: akzent_auf_dunkel
+        label: Akzent auf Fotos
+        widget: color
+      - name: text
+        label: Textfarbe
+        widget: color
+      - name: text_grau
+        label: Grauer Text
+        widget: color
+      - name: linien
+        label: Linien
+        widget: color
+      - name: hintergrund
+        label: Hintergrund
+        widget: color
+    - name: schrift_ueberschriften
+      label: Schrift Überschriften
+      widget: select
+      options:
+      - Cormorant Garamond
+      - DM Sans
+      - Georgia (Systemschrift)
+      - Systemschrift
+    - name: schrift_text
+      label: Schrift Fließtext
+      widget: select
+      options:
+      - DM Sans
+      - Cormorant Garamond
+      - Systemschrift
+    - name: ecken
+      label: Ecken der Knöpfe
+      widget: select
+      options:
+      - eckig
+      - rund
