@@ -10,6 +10,134 @@
     addEventListener('scroll', pruefe, { passive: true });
   }
 
+  // ---------- Hinweis-Banner: Besichtigungstermin ----------
+  // Texte hier anpassen. Nach "bis" wird der Banner automatisch nicht mehr gezeigt.
+  const HINWEIS = {
+    id: 'besichtigung-2026-12-06',
+    bis: '2026-12-07',
+    kicker: 'Besichtigung · Vogt-Bornkast-Weg 6',
+    titel: 'Besichtigung am Samstag, 06.12., 13–16 Uhr',
+    text: 'Lernen Sie die fertiggestellten Doppelhäuser in Hamburg-Schnelsen vor Ort kennen. Bitte melden Sie sich vorab an.',
+    anmelden: 'mailto:info@breyer-wohnbau.de?subject=Anmeldung%20Besichtigung%2006.12.%20%E2%80%93%20Vogt-Bornkast-Weg%206',
+    mehr: 'vogt-bornkast-weg-6.html',
+    empfaenger: 'info@breyer-wohnbau.de'
+  };
+  (() => {
+    if (new Date() >= new Date(HINWEIS.bis + 'T00:00:00')) return;
+    try { if (sessionStorage.getItem('hinweis-zu') === HINWEIS.id) return; } catch (e) {}
+    const box = document.createElement('aside');
+    box.className = 'hinweis';
+    box.setAttribute('aria-label', 'Hinweis: Besichtigungstermin');
+    const hier = location.pathname.endsWith(HINWEIS.mehr);
+    box.innerHTML = '<p class="hinweis-kicker"></p><p class="hinweis-titel"></p><p class="hinweis-text"></p>' +
+      '<div class="hinweis-aktionen"><a class="btn" data-anmelden>Jetzt anmelden <span class="pfeil" aria-hidden="true">→</span></a>' +
+      (hier ? '' : '<a class="textlink" data-mehr>Zum Angebot</a>') + '</div>' +
+      '<button type="button" class="hinweis-zu" aria-label="Hinweis schließen">×</button>';
+    box.querySelector('.hinweis-kicker').textContent = HINWEIS.kicker;
+    box.querySelector('.hinweis-titel').textContent = HINWEIS.titel;
+    box.querySelector('.hinweis-text').textContent = HINWEIS.text;
+    box.querySelector('[data-anmelden]').href = HINWEIS.anmelden;
+    const mehr = box.querySelector('[data-mehr]'); if (mehr) mehr.href = HINWEIS.mehr;
+    const schliesse = () => {
+      box.classList.remove('sichtbar');
+      setTimeout(() => box.remove(), 400);
+      try { sessionStorage.setItem('hinweis-zu', HINWEIS.id); } catch (e) {}
+    };
+    box.querySelector('.hinweis-zu').addEventListener('click', schliesse);
+    const anmeldeLink = box.querySelector('[data-anmelden]');
+    if (window.HTMLDialogElement && window.fetch) {
+      anmeldeLink.addEventListener('click', (e) => { e.preventDefault(); oeffneAnmeldung(); });
+    }
+    document.body.appendChild(box);
+    setTimeout(() => box.classList.add('sichtbar'), reduziert.matches ? 0 : 700);
+  })();
+
+  // ---------- Anmelde-Pop-up: Formular wird über FormSubmit an HINWEIS.empfaenger gemailt ----------
+  let anmeldung;
+  function oeffneAnmeldung() {
+    if (!anmeldung) {
+      anmeldung = document.createElement('dialog');
+      anmeldung.className = 'anmeldung';
+      anmeldung.setAttribute('aria-labelledby', 'anmeldung-titel');
+      anmeldung.innerHTML =
+        '<button type="button" class="hinweis-zu" data-zu aria-label="Fenster schließen">×</button>' +
+        '<div data-formteil>' +
+          '<p class="hinweis-kicker" data-kicker></p>' +
+          '<h2 class="anmeldung-titel" id="anmeldung-titel">Anmeldung zur Besichtigung</h2>' +
+          '<p class="hinweis-text" data-termin></p>' +
+          '<form novalidate>' +
+            '<label class="feld"><span>Name *</span><input name="Name" autocomplete="name" required></label>' +
+            '<label class="feld"><span>E-Mail *</span><input name="email" type="email" autocomplete="email" required></label>' +
+            '<label class="feld"><span>Telefon</span><input name="Telefon" type="tel" autocomplete="tel"></label>' +
+            '<label class="feld"><span>Anzahl Personen *</span><select name="Personen" required>' +
+              '<option value="1">1 Person</option><option value="2" selected>2 Personen</option><option value="3">3 Personen</option><option value="4">4 Personen</option><option value="5+">5 oder mehr</option>' +
+            '</select></label>' +
+            '<input type="text" name="_honey" class="feld-falle" tabindex="-1" autocomplete="off" aria-hidden="true">' +
+            '<label class="feld-check"><input type="checkbox" name="Datenschutz" value="akzeptiert" required><span>Ich bin einverstanden, dass meine Angaben zur Bearbeitung der Anmeldung verarbeitet werden. Mehr in der <a href="datenschutz.html" target="_blank">Datenschutzerklärung</a>. *</span></label>' +
+            '<p class="anmeldung-fehler" role="alert" hidden></p>' +
+            '<button class="btn" type="submit">Anmeldung absenden <span class="pfeil" aria-hidden="true">→</span></button>' +
+          '</form>' +
+        '</div>' +
+        '<div class="anmeldung-danke" data-danke hidden tabindex="-1">' +
+          '<p class="hinweis-kicker">Vielen Dank</p>' +
+          '<h2 class="anmeldung-titel">Ihre Anmeldung ist eingegangen.</h2>' +
+          '<p class="hinweis-text">Wir freuen uns auf Ihren Besuch und melden uns bei Rückfragen bei Ihnen.</p>' +
+          '<button type="button" class="btn" data-zu>Schließen</button>' +
+        '</div>';
+      anmeldung.querySelector('[data-kicker]').textContent = HINWEIS.kicker;
+      anmeldung.querySelector('[data-termin]').textContent = HINWEIS.titel.replace('Besichtigung am ', '');
+      anmeldung.querySelectorAll('[data-zu]').forEach((b) => b.addEventListener('click', () => anmeldung.close()));
+      anmeldung.addEventListener('click', (e) => { if (e.target === anmeldung) anmeldung.close(); });
+
+      const form = anmeldung.querySelector('form');
+      const fehler = anmeldung.querySelector('.anmeldung-fehler');
+      const senden = form.querySelector('[type=submit]');
+      const zeigeFehler = (t) => { fehler.textContent = t; fehler.hidden = false; };
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        fehler.hidden = true;
+        if (!form.checkValidity()) {
+          const erstes = form.querySelector(':invalid');
+          zeigeFehler(erstes && erstes.type === 'email' && erstes.value ? 'Bitte prüfen Sie Ihre E-Mail-Adresse.' :
+            erstes && erstes.type === 'checkbox' ? 'Bitte bestätigen Sie die Datenschutzhinweise.' : 'Bitte füllen Sie alle Pflichtfelder (*) aus.');
+          if (erstes) erstes.focus();
+          return;
+        }
+        const daten = Object.fromEntries(new FormData(form));
+        if (daten._honey) return;
+        delete daten._honey;
+        daten.Termin = HINWEIS.titel.replace('Besichtigung am ', '');
+        daten.Objekt = 'Vogt-Bornkast-Weg 6';
+        daten._subject = 'Anmeldung Besichtigung ' + daten.Termin + ' – ' + daten.Name;
+        daten._template = 'table';
+        senden.disabled = true;
+        senden.firstChild.textContent = 'Wird gesendet … ';
+        try {
+          const r = await fetch('https://formsubmit.co/ajax/' + HINWEIS.empfaenger, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify(daten)
+          });
+          const j = await r.json().catch(() => ({}));
+          if (!r.ok || String(j.success) !== 'true') throw new Error(j.message || r.status);
+          anmeldung.querySelector('[data-formteil]').hidden = true;
+          const danke = anmeldung.querySelector('[data-danke]');
+          danke.hidden = false;
+          danke.focus();
+        } catch (err) {
+          zeigeFehler('Das hat leider nicht geklappt. Bitte versuchen Sie es erneut oder schreiben Sie an ' + HINWEIS.empfaenger + '.');
+        } finally {
+          senden.disabled = false;
+          senden.firstChild.textContent = 'Anmeldung absenden ';
+        }
+      });
+      document.body.appendChild(anmeldung);
+    }
+    anmeldung.showModal();
+    const erstes = anmeldung.querySelector('[data-formteil]:not([hidden]) input');
+    if (erstes) erstes.focus();
+  }
+
   // ---------- Menü auf dem Handy ----------
   const btn = document.querySelector('.nav-toggle');
   const nav = document.getElementById('hauptnav');
