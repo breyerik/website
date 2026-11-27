@@ -16,7 +16,7 @@
     id: 'besichtigung-2026-12-06',
     bis: '2026-12-07',
     kicker: 'Besichtigung · Vogt-Bornkast-Weg 6',
-    titel: 'Besichtigung am Samstag, 06.12., 13–16 Uhr',
+    titel: 'Besichtigung am Sonntag, 06.12., 13–16 Uhr',
     text: 'Lernen Sie die fertiggestellten Doppelhäuser in Hamburg-Schnelsen vor Ort kennen. Bitte melden Sie sich vorab an.',
     anmelden: 'mailto:info@breyer-wohnbau.de?subject=Anmeldung%20Besichtigung%2006.12.%20%E2%80%93%20Vogt-Bornkast-Weg%206',
     mehr: 'vogt-bornkast-weg-6.html',
